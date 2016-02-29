@@ -1,4 +1,5 @@
 require "resolvable/version"
+require "resolvable/open_struct_shim"
 
 module Resolvable
   class DoubleSuccessError < StandardError; end
@@ -24,11 +25,11 @@ module Resolvable
     self
   end
 
-  def failure!
+  def failure!(message = nil)
     raise FailureAfterSuccessError.new if(success?)
 
     resolve(:failure)
-    add_error(self.class.default_failure_message)
+    add_error(message || self.class.default_failure_message)
 
     self
   end
