@@ -31,12 +31,20 @@ describe Resolvable do
     end.to raise_exception(Resolvable::DoubleSuccessError)
   end
 
-  it 'prevents success after failure' do
+  it 'prevents failure after success' do
     needs_resolution = NeedsResolution.new
     expect do
       needs_resolution.success!
       needs_resolution.failure!
     end.to raise_exception(Resolvable::FailureAfterSuccessError)
+  end
+
+  it 'prevents success after failure' do
+    needs_resolution = NeedsResolution.new
+    expect do
+      needs_resolution.failure!
+      needs_resolution.success!
+    end.to raise_exception(Resolvable::SuccessAfterFailureError)
   end
 
   it 'has error messages in the case of failure' do

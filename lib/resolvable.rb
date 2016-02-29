@@ -3,6 +3,7 @@ require "resolvable/version"
 module Resolvable
   class DoubleSuccessError < StandardError; end
   class FailureAfterSuccessError < StandardError; end
+  class SuccessAfterFailureError < StandardError; end
 
   module ClassMethods
     def default_failure_message
@@ -15,31 +16,46 @@ module Resolvable
   end
 
   def success!
-    raise DoubleSuccessError.new if(defined? @success)
+    raise SuccessAfterFailureError.new if(failure?)
+    raise DoubleSuccessError.new if(success?)
 
-    @success = true
+    resolve(:success)
+
     self
   end
 
   def failure!
     raise FailureAfterSuccessError.new if(success?)
 
-    @success = false
-    @errors ||= []
-    @errors << self.class.default_failure_message
+    resolve(:failure)
+    add_error(self.class.default_failure_message)
 
     self
   end
 
   def success?
-    @success == true
+    resolution == :success
   end
 
   def failure?
-    @success == false
+    resolution == :failure
   end
 
   def errors
-    @errors
+    @errors ||= []
+  end
+
+  private
+
+  def add_error(message)
+    errors << message
+  end
+
+  def resolution
+    @resolution
+  end
+
+  def resolve(resolve_into_state=:success)
+    @resolution = resolve_into_state
   end
 end
