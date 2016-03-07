@@ -44,7 +44,7 @@ else
 end
 ```
 
-### Coming soon: OpenStructShim
+### OpenStructShim
 
 Maybe you have a lot of open structs hanging around in your codebase, and you want to start to migrate those:
 
