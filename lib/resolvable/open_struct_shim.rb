@@ -10,7 +10,9 @@ module Resolvable
     attr_writer :kernel
 
     def method_missing(method_name, *args)
-      kernel.warn("Missing method called on OpenStructShim: #{method_name} is not defined on #{self.class.name}")
+      file, line, method_info = caller(1, 1)[0].split(":")
+
+      kernel.warn "Missing method called on OpenStructShim: #{method_name} is not defined on #{self.class.name} (Called from #{file}##{line} in #{method_info}"
 
       super
     end
