@@ -22,8 +22,12 @@ module Resolvable
 
     def initialize(*args)
       auto_generated_methods = args[0] || {}
-      auto_generated_methods.each do |k, v| 
-        __suggest_method__("#{k}=", nil, nil, nil) if @@suggest
+      auto_generated_methods.each do |k, v|
+        if(respond_to?("#{k}="))
+          send("#{k}=", v)
+        else
+          __suggest_method__("#{k}=", nil, nil, nil)
+        end
       end
 
       self.kernel = Kernel
@@ -34,17 +38,21 @@ module Resolvable
     def method_missing(method_name, *args)
       file, line, method_info = caller(1, 1)[0].split(":")
 
-      __warn__(method_name, file, line, method_info) if @@warn
-      __suggest_method__(method_name, file, line, method_info) if @@suggest
+      __warn__(method_name, file, line, method_info)
+      __suggest_method__(method_name, file, line, method_info)
 
       super
     end
 
     def __warn__(method_name, file, line, method_info)
+      return unless @@warn
+
       kernel.warn "Missing method called on OpenStructShim: #{method_name} is not defined on #{self.class.name} (Called from #{file}##{line} in #{method_info}"
     end
 
     def __suggest_method__(method_name, file, line, method_info)
+      return unless @@suggest
+
       type = :attr_reader
 
       if method_name =~ /=$/

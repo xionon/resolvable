@@ -13,7 +13,7 @@ describe Resolvable::OpenStructShim do
       self.warn = true
       self.suggest = true
       attr_reader :readable
-      attr_accessor :accessable
+      attr_accessor :accessable, :fizz
       def calls_unexpected_method
         self.suggested_method()
       end
@@ -47,6 +47,15 @@ describe Resolvable::OpenStructShim do
     it "doesn't warn on attr_accessor methods" do
       subject.accessable = :foo
       expect(subject.accessable).to eq(:foo)
+      expect(subject.__suggested_methods__).to be_empty
+    end
+
+    it "doesn't warn on explicitly set attr_accessor methods" do
+      subject = ResolveAndSuggest.new(:fizz => :bar).tap do |nr|
+        nr.kernel = fake_kernel
+      end
+
+      expect(subject.fizz).to eq(:bar)
       expect(subject.__suggested_methods__).to be_empty
     end
 
