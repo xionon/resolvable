@@ -2,6 +2,8 @@ require "spec_helper"
 
 describe Resolvable::OpenStructShim do
   class NeedsResolutionAndFlexibility < Resolvable::OpenStructShim
+    self.warnings = true
+    self.suggestions = true
     def calls_internal_method_that_doesnt_exist
       self.internal_method_that_doesnt_exist = true
     end
@@ -80,7 +82,7 @@ describe Resolvable::OpenStructShim do
 
     it "includes the line number for fake methods called internally" do
       subject.calls_internal_method_that_doesnt_exist
-      expect(fake_warnings.string).to match(/6/)
+      expect(fake_warnings.string).to match(/8/)
       expect(subject.internal_method_that_doesnt_exist).to eq(true)
     end
   end

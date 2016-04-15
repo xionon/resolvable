@@ -10,8 +10,8 @@ describe Resolvable::OpenStructShim do
 
   context "with self.warn=true and self.suggest=true" do
     class ResolveAndSuggest < Resolvable::OpenStructShim
-      self.warn = true
-      self.suggest = true
+      self.warnings = true
+      self.suggestions = true
       attr_reader :readable
       attr_accessor :accessable, :fizz
       def calls_unexpected_method

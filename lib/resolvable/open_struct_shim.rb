@@ -1,4 +1,5 @@
 require 'ostruct'
+require 'resolvable/config_methods'
 
 module Resolvable
   SuggestedMethod = Struct.new(:file, :line, :method_info, :type)
@@ -6,12 +7,8 @@ module Resolvable
   class OpenStructShim < OpenStruct
     include Resolvable
 
-    def self.warn=(should_warn)
-      @@warn = should_warn
-    end
-
-    def self.suggest=(should_suggest)
-      @@suggest = should_suggest
+    def self.inherited(klass)
+      klass.include(ConfigMethods)
     end
 
     def self.default_failure_message
@@ -45,13 +42,13 @@ module Resolvable
     end
 
     def __warn__(method_name, file, line, method_info)
-      return unless @@warn
+      return unless self.class.warnings
 
       kernel.warn "Missing method called on OpenStructShim: #{method_name} is not defined on #{self.class.name} (Called from #{file}##{line} in #{method_info}"
     end
 
     def __suggest_method__(method_name, file, line, method_info)
-      return unless @@suggest
+      return unless self.class.suggestions
 
       type = :attr_reader
 
